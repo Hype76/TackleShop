@@ -1,0 +1,464 @@
+---
+import type { TackleShop } from '../types/shops';
+
+interface Props {
+  regions: string[];
+}
+
+const { regions } = Astro.props;
+---
+
+<dialog id="addShopDialog" class="shop-dialog" aria-labelledby="dialog-title">
+    <form id="addShopForm" class="shop-form" novalidate>
+        <h2 id="dialog-title">Add New Shop</h2>
+        
+        <div class="form-tabs">
+            <button type="button" class="tab-button active" data-tab="form" role="tab" aria-selected="true" aria-controls="formTab">Form</button>
+            <button type="button" class="tab-button" data-tab="json" role="tab" aria-selected="false" aria-controls="jsonTab">JSON</button>
+        </div>
+
+        <div class="tab-content" id="formTab" role="tabpanel" aria-labelledby="formTab">
+            <div class="form-group">
+                <label for="name">Shop Name*</label>
+                <input type="text" id="name" name="name" required minlength="2" autocomplete="organization">
+            </div>
+        
+            <div class="form-group">
+                <label for="address">Address*</label>
+                <input type="text" id="address" name="address" required minlength="5" autocomplete="street-address">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="city">City*</label>
+                    <input type="text" id="city" name="city" required minlength="2" autocomplete="address-level2">
+                </div>
+                <div class="form-group">
+                    <label for="postcode">Postcode*</label>
+                    <input type="text" id="postcode" name="postcode" required pattern="[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}" autocomplete="postal-code">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="region">Region*</label>
+                <select id="region" name="region" required autocomplete="address-level1">
+                    <option value="">Select a region</option>
+                    {regions.map((region) => (
+                        <option value={region}>{region}</option>
+                    ))}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" pattern="^\+?[0-9\s-()]{10,}$" autocomplete="tel">
+            </div>
+
+            <div class="form-group">
+                <label for="website">Website</label>
+                <input type="url" id="website" name="website" pattern="https?://.+" autocomplete="url">
+            </div>
+
+            <div class="form-group">
+                <label for="specialties">Specialties (comma-separated)</label>
+                <input type="text" id="specialties" name="specialties" 
+                       placeholder="e.g., Carp Fishing, Match Fishing">
+            </div>
+        </div>
+
+        <div class="tab-content hidden" id="jsonTab" role="tabpanel" aria-labelledby="jsonTab">
+            <div class="form-group">
+                <div class="json-input-container" id="dropZone">
+                    <label for="jsonInput">Paste JSON Data or Drop .json File</label>
+                    <textarea 
+                        id="jsonInput" 
+                        rows="10" 
+                        placeholder="Paste JSON data or drop a .json file here..."
+                        aria-describedby="jsonFormatHint"
+                    ></textarea>
+                    <div class="drop-overlay">
+                        <span>Drop .json file here</span>
+                    </div>
+                </div>
+                <div id="jsonFormatHint" class="json-format-hint">
+                    Expected format:
+                    <pre>{{
+    "name": "Shop Name",
+    "address": "Shop Address",
+    "city": "City",
+    "postcode": "Postcode",
+    "region": "Region",
+    "phone": "Phone Number",
+    "website": "Website URL",
+    "specialties": ["Specialty 1", "Specialty 2"]
+}}</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="button secondary" onclick="window.closeDialog()">Cancel</button>
+            <button type="submit" class="button primary">Add Shop</button>
+        </div>
+    </form>
+</dialog>
+
+<style>
+    .shop-dialog {
+        border: none;
+        border-radius: 8px;
+        padding: 0;
+        max-width: 600px;
+        width: 90%;
+    }
+
+    .shop-dialog::backdrop {
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    .shop-form {
+        padding: 2rem;
+    }
+
+    h2 {
+        margin: 0 0 1.5rem 0;
+        color: var(--text);
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 0.5rem;
+    }
+
+    .tab-button {
+        background: none;
+        border: none;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        color: #64748b;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+    .tab-button.active {
+        color: var(--primary);
+        border-bottom: 2px solid var(--primary);
+        margin-bottom: -0.5rem;
+    }
+
+    .tab-content {
+        display: block;
+    }
+
+    .tab-content.hidden {
+        display: none;
+    }
+
+    #jsonInput {
+        width: 100%;
+        font-family: monospace;
+        min-height: 200px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text);
+        font-weight: 500;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 1rem;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .json-format-hint {
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .json-format-hint pre {
+        background: #f1f5f9;
+        padding: 0.75rem;
+        border-radius: 6px;
+        overflow-x: auto;
+    }
+
+    .json-input-container {
+        position: relative;
+        border: 2px dashed #e2e8f0;
+        border-radius: 6px;
+        padding: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .json-input-container.drag-over {
+        border-color: var(--primary);
+        background: rgba(52, 152, 219, 0.05);
+    }
+
+    .drop-overlay {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(52, 152, 219, 0.9);
+        color: white;
+        justify-content: center;
+        align-items: center;
+        border-radius: 4px;
+        font-size: 1.2rem;
+        font-weight: 500;
+    }
+
+    .json-input-container.drag-over .drop-overlay {
+        display: flex;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .primary:hover {
+        background: #2980b9;
+    }
+
+    .secondary {
+        background: #e2e8f0;
+        color: var(--text);
+    }
+
+    .secondary:hover {
+        background: #cbd5e1;
+    }
+</style>
+
+<script>
+    const dialog = document.getElementById('addShopDialog') as HTMLDialogElement;
+    const form = document.getElementById('addShopForm') as HTMLFormElement;
+    const jsonInput = document.getElementById('jsonInput') as HTMLTextAreaElement;
+    const dropZone = document.getElementById('dropZone');
+
+    // File drop handling
+    function handleDragOver(e: DragEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone?.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e: DragEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone?.classList.remove('drag-over');
+    }
+
+    async function handleDrop(e: DragEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone?.classList.remove('drag-over');
+
+        const file = e.dataTransfer?.files[0];
+        if (!file || !file.name.toLowerCase().endsWith('.json')) {
+            alert('Please drop a valid .json file');
+            return;
+        }
+
+        try {
+            const text = await file.text();
+            if (jsonInput) {
+                jsonInput.value = text;
+            }
+        } catch (error) {
+            alert('Error reading file: ' + error.message);
+        }
+    }
+
+    // Add drag and drop event listeners
+    dropZone?.addEventListener('dragover', handleDragOver);
+    dropZone?.addEventListener('dragleave', handleDragLeave);
+    dropZone?.addEventListener('drop', handleDrop);
+
+    // Make the showAddShopDialog function available globally
+    function showAddShopDialog() {
+        dialog?.showModal();
+    }
+    window.showAddShopDialog = showAddShopDialog;
+
+    // Make closeDialog available globally
+    function closeDialog() {
+        dialog?.close();
+        form?.reset();
+    }
+    window.closeDialog = closeDialog;
+    
+    // Tab switching
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const tab = button.getAttribute('data-tab');
+            
+            // Update active states
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Show/hide content
+            tabContents.forEach(content => {
+                content.classList.add('hidden');
+                if (content.id === `${tab}Tab`) {
+                    content.classList.remove('hidden');
+                }
+            });
+        });
+    });
+
+    form?.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        let newShop: TackleShop;
+        const activeTab = document.querySelector('.tab-button.active');
+
+        if (activeTab?.getAttribute('data-tab') === 'json') {
+            try {
+                // Pre-process JSON to fix common formatting issues
+                let jsonText = jsonInput?.value.trim() || '{}';
+                
+                // Fix unquoted URLs
+                jsonText = jsonText.replace(/:\s*(http[s]?:\/\/[^,\s}]+)/g, ': "$1"');
+                
+                const jsonData = JSON.parse(jsonText);
+                const shops = Array.isArray(jsonData) ? jsonData : [jsonData];
+
+                for (let i = 0; i < shops.length; i++) {
+                    const shop = shops[i];
+                    
+                    // Clean specialties
+                    if (shop.specialties) {
+                        shop.specialties = shop.specialties.map(s => 
+                            String(s).replace(/['"]+/g, '').trim()
+                        );
+                    }
+
+                    // Clean website URL
+                    if (shop.website) {
+                        try {
+                            const url = String(shop.website).replace(/['"]+/g, '').trim();
+                            if (!url.match(/^https?:\/\//)) {
+                                shop.website = `https://${url}`;
+                            }
+                            new URL(shop.website);
+                        } catch {
+                            throw new Error(`Invalid website URL for shop "${shop.name || `#${i + 1}`}"`);
+                        }
+                    }
+                    
+                    // Validate required fields
+                    const requiredFields = ['name', 'address', 'city', 'postcode', 'region'];
+                    const missingFields = requiredFields.filter(field => !shop[field]);
+                    
+                    if (missingFields.length > 0) {
+                        throw new Error(`Shop "${shop.name || `#${i + 1}`}" is missing required fields: ${missingFields.join(', ')}`);
+                    }
+                }
+                
+                // Dispatch events for each shop
+                for (const shop of shops) {
+                    window.dispatchEvent(new CustomEvent('shopAdded', { 
+                        detail: shop,
+                        bubbles: true
+                    }));
+                }
+                
+                closeDialog();
+            } catch (error) {
+                alert(error.message);
+                return;
+            }
+        } else {
+            // Validate form before proceeding with manual input
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const formData = new FormData(form);
+            const specialtiesStr = formData.get('specialties') as string;
+            
+            newShop = {
+                name: formData.get('name'),
+                address: (formData.get('address') as string).trim(),
+                city: (formData.get('city') as string).trim(),
+                postcode: (formData.get('postcode') as string).trim().toUpperCase(),
+                region: formData.get('region'),
+                phone: (formData.get('phone') as string)?.trim() || undefined,
+                website: (formData.get('website') as string)?.trim() || undefined,
+                specialties: specialtiesStr ? specialtiesStr.split(',').map(s => s.trim()) : undefined
+            };
+
+            window.dispatchEvent(new CustomEvent('shopAdded', { 
+                detail: newShop,
+                bubbles: true
+            }));
+
+            closeDialog();
+        }
+    });
+
+    // Auto-format postcode input
+    const postcodeInput = document.getElementById('postcode') as HTMLInputElement;
+    postcodeInput?.addEventListener('input', (e) => {
+        const input = e.target as HTMLInputElement;
+        let value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        
+        // Add space in the correct position for UK postcodes
+        if (value.length > 3) {
+            const inward = value.slice(-3);
+            const outward = value.slice(0, -3);
+            value = `${outward} ${inward}`;
+        }
+        
+        input.value = value;
+    });
+</script>

@@ -1,0 +1,83 @@
+---
+interface Props {
+    regions: string[];
+}
+
+const { regions } = Astro.props;
+---
+
+<div class="search-filter">
+    <input 
+        type="text" 
+        id="searchInput" 
+        placeholder="Search by shop name or location..."
+        class="search-input"
+    />
+    
+    <select id="regionFilter" class="region-select">
+        <option value="">All Regions</option>
+        {regions.map((region) => (
+            <option value={region}>{region}</option>
+        ))}
+    </select>
+</div>
+
+<style>
+    .search-filter {
+        display: flex;
+        flex: 1;
+        gap: 1rem;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 0.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 1rem;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #3498db;
+    }
+
+    .region-select {
+        padding: 0.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        background-color: white;
+        font-size: 1rem;
+        min-width: 200px;
+    }
+
+    .region-select:focus {
+        outline: none;
+        border-color: #3498db;
+    }
+</style>
+
+<script>
+    const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+    const regionFilter = document.getElementById('regionFilter') as HTMLSelectElement;
+    const shopCards = document.querySelectorAll('.shop-card');
+
+    function filterShops() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedRegion = regionFilter.value.toLowerCase();
+
+        shopCards.forEach(card => {
+            const container = card.closest('[data-region]');
+            const text = card.textContent.toLowerCase();
+            const region = container.getAttribute('data-region').toLowerCase();
+            
+            const matchesSearch = text.includes(searchTerm);
+            const matchesRegion = !selectedRegion || region === selectedRegion;
+
+            container.style.display = matchesSearch && matchesRegion ? 'block' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', filterShops);
+    regionFilter.addEventListener('change', filterShops);
+</script>

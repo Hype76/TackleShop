@@ -1,0 +1,38 @@
+---
+import FormTabs from './FormTabs.astro';
+import ShopFormFields from './ShopFormFields.astro';
+import JsonInput from './JsonInput.astro';
+import './styles.css';
+
+interface Props {
+  regions: string[];
+}
+
+const { regions } = Astro.props;
+---
+
+<dialog id="addShopDialog" class="shop-dialog" aria-labelledby="dialog-title">
+    <form id="addShopForm" class="shop-form">
+        <h2 id="dialog-title">Add New Shop</h2>
+        
+        <FormTabs />
+
+        <div class="tab-content" id="formTab">
+            <ShopFormFields regions={regions} />
+        </div>
+
+        <div class="tab-content hidden" id="jsonTab">
+            <JsonInput />
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="button secondary" onclick="window.closeDialog()">Cancel</button>
+            <button type="submit" class="button primary">Add Shop</button>
+        </div>
+    </form>
+</dialog>
+
+<script>
+    import { initializeForm } from './formHandler';
+    initializeForm();
+</script>

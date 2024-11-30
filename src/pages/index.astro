@@ -1,0 +1,124 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ShopCard from '../components/ShopCard.astro';
+import SearchFilter from '../components/SearchFilter.astro';
+import AddShopForm from '../components/AddShopForm.astro';
+import { getAllShops, initializeShops, addShop } from '../db/shops';
+import type { TackleShop } from '../types/shops';
+import { initialShops } from '../data/shops';
+
+let shops = [];
+let regions: string[] = [];
+
+if (import.meta.env.SSR) {
+  shops = initialShops;
+} else {
+  try {
+    await initializeShops();
+    shops = await getAllShops();
+  } catch (error) {
+    console.error('Error loading shops:', error);
+    shops = initialShops; // Fallback to initial data if database fails
+  }
+}
+
+regions = [...new Set(shops.map(shop => shop.region))].sort();
+---
+
+<Layout title="UK Fishing Tackle Shop Directory">
+	<main>
+		<h1>UK Fishing Tackle Shops</h1>
+		<div class="toolbar">
+			<SearchFilter regions={regions} />
+			<button id="addShopButton" class="add-button" onclick="showAddShopDialog()">
+				<span>+</span> Add Shop
+			</button>
+		</div>
+		<div class="shops-grid">
+			{shops.map(shop => (
+				<div data-region={shop.region}>
+					<ShopCard {...shop} />
+				</div>
+			))}
+		</div>
+		<AddShopForm regions={regions} />
+	</main>
+</Layout>
+
+<script>
+ import type { TackleShop } from '../types/shops';
+ // Make addShop available in the global scope
+ const { addShop } = await import('../db/shops');
+
+ interface ShopAddedEvent extends CustomEvent {
+   detail: TackleShop
+ }
+ 
+ window.addEventListener('shopAdded', async (e: ShopAddedEvent) => {
+   try {
+     await addShop(e.detail);
+     window.location.reload();
+   } catch (error) {
+     alert(error.message);
+   }
+ });
+</script>
+
+<style>
+	main {
+		margin: auto;
+		padding: 2rem;
+		width: 1200px;
+		max-width: calc(100% - 2rem);
+		color: #2c3e50;
+		font-size: 16px;
+		line-height: 1.6;
+		background: #f8fafc;
+		min-height: 100vh;
+	}
+
+	h1 {
+		font-size: 2.5rem;
+		font-weight: 700;
+		text-align: center;
+		margin-bottom: 2rem;
+		color: #2c3e50;
+	}
+
+	.toolbar {
+		display: flex;
+		gap: 1rem;
+		align-items: flex-start;
+		margin-bottom: 2rem;
+	}
+
+	.add-button {
+		background: var(--primary);
+		color: white;
+		border: none;
+		border-radius: 6px;
+		padding: 0.75rem 1.5rem;
+		font-size: 1rem;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		transition: background-color 0.2s;
+		white-space: nowrap;
+	}
+
+	.add-button:hover {
+		background: #2980b9;
+	}
+
+	.add-button span {
+		font-size: 1.2rem;
+		font-weight: bold;
+	}
+
+	.shops-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: 1.5rem;
+	}
+</style>

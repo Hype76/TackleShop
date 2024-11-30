@@ -1,0 +1,22 @@
+{
+  "name": "@example/basics",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "view-db": "tsx src/db/viewDb.ts"
+  },
+  "dependencies": {
+    "astro": "^4.15.3",
+    "sql.js": "^1.8.0"
+  },
+  "devDependencies": {
+    "@types/sql.js": "1.4.9",
+    "tsx": "^4.7.0"
+  }
+}

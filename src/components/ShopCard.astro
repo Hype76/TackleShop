@@ -1,0 +1,102 @@
+---
+interface Props {
+    name: string;
+    address: string;
+    city: string;
+    postcode: string;
+    phone?: string;
+    website?: string;
+    specialties?: string[];
+}
+
+const { name, address, city, postcode, phone, website, specialties } = Astro.props;
+---
+
+<div class="shop-card">
+    <h2>{name}</h2>
+    <div class="details">
+        <p class="address">
+            {address}<br />
+            {city}<br />
+            {postcode}
+        </p>
+        {phone && <p class="phone">📞 <a href={`tel:${phone}`}>{phone}</a></p>}
+        {website && <p class="website">🌐 <a href={website} target="_blank" rel="noopener noreferrer">Visit Website</a></p>}
+    </div>
+    {specialties && specialties.length > 0 && (
+        <div class="specialties">
+            <h3>Specialties:</h3>
+            <ul>
+                {specialties.map((specialty) => <li>{specialty}</li>)}
+            </ul>
+        </div>
+    )}
+</div>
+
+<style>
+    .shop-card {
+        background: #ffffff;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        color: #2c3e50;
+        margin: 0 0 1rem 0;
+        font-size: 1.5rem;
+    }
+
+    .details {
+        margin-bottom: 1rem;
+    }
+
+    .address {
+        color: #34495e;
+        margin: 0 0 0.5rem 0;
+        line-height: 1.4;
+    }
+
+    .phone, .website {
+        margin: 0.5rem 0;
+    }
+
+    .phone a, .website a {
+        color: #3498db;
+        text-decoration: none;
+    }
+
+    .phone a:hover, .website a:hover {
+        text-decoration: underline;
+    }
+
+    .specialties {
+        border-top: 1px solid #eee;
+        padding-top: 1rem;
+        margin-top: 1rem;
+    }
+
+    .specialties h3 {
+        color: #2c3e50;
+        font-size: 1rem;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .specialties ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .specialties li {
+        background: #f0f7ff;
+        color: #3498db;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.9rem;
+    }
+</style>

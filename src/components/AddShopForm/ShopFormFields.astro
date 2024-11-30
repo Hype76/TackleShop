@@ -1,0 +1,54 @@
+---
+interface Props {
+  regions: string[];
+}
+
+const { regions } = Astro.props;
+---
+
+<div class="form-group">
+    <label for="name">Shop Name*</label>
+    <input type="text" id="name" name="name" required>
+</div>
+
+<div class="form-group">
+    <label for="address">Address*</label>
+    <input type="text" id="address" name="address" required>
+</div>
+
+<div class="form-row">
+    <div class="form-group">
+        <label for="city">City*</label>
+        <input type="text" id="city" name="city" required>
+    </div>
+    <div class="form-group">
+        <label for="postcode">Postcode*</label>
+        <input type="text" id="postcode" name="postcode" required>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="region">Region*</label>
+    <select id="region" name="region" required>
+        <option value="">Select a region</option>
+        {regions.map((region) => (
+            <option value={region}>{region}</option>
+        ))}
+    </select>
+</div>
+
+<div class="form-group">
+    <label for="phone">Phone Number</label>
+    <input type="tel" id="phone" name="phone">
+</div>
+
+<div class="form-group">
+    <label for="website">Website</label>
+    <input type="url" id="website" name="website">
+</div>
+
+<div class="form-group">
+    <label for="specialties">Specialties (comma-separated)</label>
+    <input type="text" id="specialties" name="specialties" 
+           placeholder="e.g., Carp Fishing, Match Fishing">
+</div>
